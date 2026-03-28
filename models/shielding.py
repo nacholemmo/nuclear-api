@@ -1,6 +1,8 @@
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 
+from config import settings
+
 
 class MaterialType(str, Enum):
     LEAD = "Plomo"
@@ -34,13 +36,19 @@ class ShieldingSimulationRequest(BaseModel):
     n_photons: int = Field(
         ...,
         gt=0,
-        le=1_000_000,
         description="Number of photons to simulate"
     )
     use_random_walk: bool = Field(
         default=True,
         description="Use stochastic random walk (True) or Beer-Lambert law (False)"
     )
+
+    @field_validator("n_photons")
+    @classmethod
+    def validate_n_photons(cls, v: int) -> int:
+        if v > settings.MAX_PHOTONS:
+            raise ValueError(f"n_photons must be <= {settings.MAX_PHOTONS}")
+        return v
 
 
 class ShieldingSimulationResponse(BaseModel):

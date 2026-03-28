@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: nuclear-api
+    runtime: python
+    buildCommand: pip install .
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_RELOAD
+        value: false
+      - key: CORS_ORIGINS
+        value: http://localhost:4200
+      - key: MAX_EVENTS
+        value: 1000000
+      - key: MAX_PHOTONS
+        value: 1000000
+      - key: MAX_SIMULATIONS
+        value: 1000000

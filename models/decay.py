@@ -1,6 +1,8 @@
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 
+from config import settings
+
 
 class IsotopeType(str, Enum):
     TC99M = "Tc-99m"
@@ -30,9 +32,15 @@ class DecaySimulationRequest(BaseModel):
     n_simulations: int = Field(
         default=10_000,
         gt=0,
-        le=1_000_000,
         description="Number of Monte Carlo simulations"
     )
+
+    @field_validator("n_simulations")
+    @classmethod
+    def validate_n_simulations(cls, v: int) -> int:
+        if v > settings.MAX_SIMULATIONS:
+            raise ValueError(f"n_simulations must be <= {settings.MAX_SIMULATIONS}")
+        return v
 
 
 class DecaySimulationResponse(BaseModel):

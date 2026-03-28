@@ -1,13 +1,21 @@
 from pydantic import BaseModel, Field, field_validator
 
+from config import settings
+
 
 class PETSimulationRequest(BaseModel):
     n_events: int = Field(
         ...,
         gt=0,
-        le=1_000_000,
         description="Number of annihilation events to simulate"
     )
+
+    @field_validator("n_events")
+    @classmethod
+    def validate_n_events(cls, v: int) -> int:
+        if v > settings.MAX_EVENTS:
+            raise ValueError(f"n_events must be <= {settings.MAX_EVENTS}")
+        return v
     tumor_radius: float = Field(
         ...,
         gt=0,
